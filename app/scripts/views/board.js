@@ -7,6 +7,7 @@ define([
 ], function($, _, Backbone, Tile, Tiles){
   var BoardView = Backbone.View.extend({
     elGrid: $('#grid'),
+    elSaved: $("#saved"),
     events: {
       'click .tile': 'tileClicked',
       'click #clear': 'clearGrid',
@@ -15,9 +16,25 @@ define([
     defaultRows: 15,
     defaultColumns: 10,
     
-    initialize: function(){
-      this.collection = new Tiles();
-      this.collection.fetch();
+    initialize: function(options){
+      var self = this;
+      var key = window.location.hash.substr(1);
+
+      self.collection = new Tiles([], {
+        router: options.router
+      });
+
+      self.collection.fetch({ 
+        data: $.param({ key: key})
+      });
+
+      self.listenTo(Backbone, 'BoardView:SaveSuccess', function(){
+        self.showSuccessMsg();
+      });
+
+      self.listenTo(self.collection, 'change reset add remove', function(){
+        self.updateBoard();
+      });
     },
 
     /**
@@ -34,6 +51,7 @@ define([
     clearGrid: function(){
       $(this.elGrid).html('');
       this.buildGrid();
+      this.collection.reset([], {silent: true});
     },
     
     /**
@@ -62,10 +80,10 @@ define([
       var pos = $(e.target).attr('data-id');
       var hex = this.changeColor();
       var tile = new Tile();
-
+      
       if (this.isWhite(target)){
         tile.set({id: pos, position: pos, color: hex});
-        this.collection.add(tile);
+        this.collection.add(tile, {silent: true});
         $(e.target).css('background-color', hex);
       } else{
         $(e.target).css('background-color', '#fff');
@@ -76,7 +94,7 @@ define([
     * Verify if color is white
     *
     * TODO: check for cross browser 
-    * issues with detecting white.
+    * issues with detecting the color white.
     */
     isWhite: function(target){
       return (
@@ -99,9 +117,29 @@ define([
     * Save Board (no-op)
     */
     saveColorBoard: function(){
-      this.collection.saveBoard();
-    }
+      var key = window.location.hash.substr(1);
+      this.collection.saveBoard(key);
+    },
 
+    /**
+    * Render success message
+    */
+    showSuccessMsg: function(){
+      this.elSaved.show().delay(1500).fadeOut();
+    },
+
+    /**
+    * Updates Board
+    */
+    updateBoard: function(){
+      var self = this;
+      
+      _.each(self.collection.models, function(model){
+        var pos = model.get('position');
+        var tile = self.elGrid.find("div[data-id='"+pos+"']");
+        tile.css('background-color', model.get('color'));
+      });
+    }
   });
 
   return BoardView;

@@ -20,8 +20,6 @@ node_modules
 ### Bower ###
 app/bower_components
 
-venv
-
 ### Linux ###
 .*
 !.gitignore
@@ -41,3 +39,7 @@ venv
 ### Yeoman ###
 dist
 test/temp
+
+###python###
+*.pyc
+venv

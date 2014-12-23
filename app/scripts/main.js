@@ -2,42 +2,47 @@
 'use strict';
 
 require.config({
-    shim: {
-        underscore: {
-            exports: '_'
-        },
-        backbone: {
-            deps: [
-                'underscore',
-                'jquery'
-            ],
-            exports: 'Backbone'
-        },
-        bootstrap: {
-            deps: ['jquery'],
-            exports: 'jquery'
-        }
+  shim: {
+    underscore: {
+        exports: '_'
     },
-    paths: {
-        jquery: '../bower_components/jquery/jquery',
-        backbone: '../bower_components/backbone/backbone',
-        underscore: '../bower_components/underscore/underscore',
-        bootstrap: 'vendor/bootstrap'
+    backbone: {
+        deps: [
+            'underscore',
+            'jquery'
+        ],
+        exports: 'Backbone'
+    },
+    bootstrap: {
+        deps: ['jquery'],
+        exports: 'jquery'
     }
+  },
+  paths: {
+    jquery: '../bower_components/jquery/jquery',
+    backbone: '../bower_components/backbone/backbone',
+    underscore: '../bower_components/underscore/underscore',
+    bootstrap: 'vendor/bootstrap'
+  }
 });
 
 require([
-    'backbone',
-    'views/board'
+  'backbone',
+  'views/board',
+  'routers/routes',
+  'collections/tiles'
 ], function (
-    Backbone,
-    Colorboard
+  Backbone,
+  Colorboard,
+  ColorboardRouter,
+  Tiles
 ) {
-    Backbone.history.start();
-    
-    var colorboard = new Colorboard({
-        el: $('.container')
-    });
-    colorboard.render();
+  var router = new ColorboardRouter();
+  var colorboard = new Colorboard({
+      el: $('.container'),
+      router: router
+  });
+  colorboard.render();
 
+  Backbone.history.start();
 });
