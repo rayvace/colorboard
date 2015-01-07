@@ -32,8 +32,7 @@ def save_board():
     # initialize
     if len(key) == 0:
         key = get_key()
-        session['key'] = key
-    cache.set(key, tiles, timeout=86400)
+    cache.set(key, tiles, timeout=864000)
 
     return jsonify(success='success', key=key)
 
